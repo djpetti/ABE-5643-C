@@ -1,3 +1,5 @@
 black
 tabulate
 seaborn
+numpy
+pandas
