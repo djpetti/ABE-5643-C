@@ -10,8 +10,9 @@ import pandas as pd
 import seaborn as sns
 
 from compartment_model import (
+    MatrixCompartmentModel,
     CompartmentModel,
-    Flow,
+    LinearFlow,
     ConstantFlow,
     SourceProportionalFlow,
 )
@@ -21,7 +22,7 @@ from common.numerical_integration import RK4Solver
 sns.set_theme()
 
 
-class LightFlow(Flow):
+class LightFlow(LinearFlow):
     """
     Simulates the flow of light into the system.
     """
@@ -43,6 +44,10 @@ class LightFlow(Flow):
         # Keeps track of the current week of the year.
         self.__week = 0
 
+    @property
+    def is_dynamic(self) -> bool:
+        return True
+
     def set_week(self, week: int) -> None:
         """
         Sets the current week of the year to use when calculating the amount of
@@ -54,12 +59,13 @@ class LightFlow(Flow):
         """
         self.__week = week
 
-    def difference_eq(self, prior_output: np.array) -> np.array:
+    @property
+    def rate_constants(self) -> np.array:
         light = self.__mean_photo + self.__range * np.sin(
             2 * np.pi * (self.__week - 11) / 52
         )
 
-        return np.array([light])
+        return np.array([0, 0, light], dtype=float)
 
 
 def _make_model() -> Tuple[CompartmentModel, LightFlow]:
@@ -68,7 +74,7 @@ def _make_model() -> Tuple[CompartmentModel, LightFlow]:
         The Silver Springs model, and the light input flow.
 
     """
-    model = CompartmentModel()
+    model = MatrixCompartmentModel()
 
     model.add_compartment("producers")
     model.add_compartment("herbivores")
