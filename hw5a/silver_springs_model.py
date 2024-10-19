@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from compartment_model import (
+from common.compartment_model import (
     MatrixCompartmentModel,
     CompartmentModel,
     LinearFlow,
